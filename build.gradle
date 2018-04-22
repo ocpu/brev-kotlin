@@ -12,16 +12,20 @@ buildscript {
 group = 'io.opencubes'
 version = '1.0.0'
 
-apply plugin: 'kotlin'
-
-repositories {
-    mavenCentral()
+subprojects {
+    version = '1.0'
 }
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+apply plugin: 'kotlin'
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
-
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }

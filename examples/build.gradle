@@ -1,1 +1,25 @@
 apply plugin: 'kotlin'
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile files("$buildDir/libs/brev-1.0.0.jar")
+}
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.suppressWarnings = true
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.suppressWarnings = true
+}
+
+sourceSets {
+    main.kotlin.srcDirs 'src'
+}
+gradle.taskGraph.whenReady {
+    gradle.taskGraph.allTasks.each {
+        if(it.project == project) {
+            it.onlyIf { false }
+        }
+    }
+}
