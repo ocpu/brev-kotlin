@@ -10,7 +10,7 @@ interface IEventStream<T> {
   fun forEach(action: Consumer<in T>)
   fun peek(action: Consumer<in T>): IEventStream<T>
   fun combine(other: IEventStream<T>): IEventStream<T>
-  fun skip(n: Long): IEventStream<T>
+  fun skip(n: Number): IEventStream<T>
 
   fun <R> map(mapper: (T) -> R) = map(Function<T, R> { mapper(it) })
   fun <R> mapTo() = map(Function<T, R> { it as R })

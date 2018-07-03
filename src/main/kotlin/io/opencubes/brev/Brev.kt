@@ -113,8 +113,8 @@ open class Brev private constructor(val global: Boolean) : IMessageBus {
       return stream
     }
 
-    override fun skip(n: Long): IEventStream<T> {
-      var times = n
+    override fun skip(n: Number): IEventStream<T> {
+      var times = n.toLong()
       val stream = execute<T>()
       func = { if (times == 0L) stream(it) else times-- }
       return stream
