@@ -9,6 +9,14 @@ buildscript {
     }
 }
 
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.2.21'
+    id 'org.jetbrains.dokka' version '0.9.16'
+    id 'com.jfrog.bintray' version '1.8.0'
+    id 'maven'
+//    id 'signing'
+}
+
 group = 'io.opencubes'
 version = '1.0.0'
 
@@ -31,4 +39,81 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+bintray {
+    user = bintrayUser
+    key = bintrayKey
+    configurations = ['archives']
+    pkg {
+        repo = "maven"
+        name = project.name
+        websiteUrl = 'https://github.com/ocpu/brev-kotlin'
+        vcsUrl = "https://github.com/ocpu/brev-kotlin.git"
+        licenses = ['MIT']
+//        publish = true
+        version {
+            name = project.version
+            vcsTag = project.version
+        }
+    }
+}
+
+task createPom << {
+    pom {
+        project {
+            packaging "jar"
+            groupId project.group
+            artifactId archivesBaseName
+            version project.version
+            name project.name
+            description 'A basic event system'
+            url 'https://github.com/ocpu/brev-kotlin'
+            inceptionYear '2017'
+            licenses {
+                license {
+                    name 'MIT'
+                    distribution 'repo'
+                }
+            }
+            developers {
+                developer {
+                    id "ocpu"
+                    name "Martin Hövre"
+                    email "martin.hovre@opencubes.io"
+                }
+            }
+            scm {
+                connection "https://github.com/ocpu/brev-kotlin.git"
+                developerConnection "https://github.com/ocpu/brev-kotlin.git"
+                url 'https://github.com/ocpu/brev-kotlin'
+            }
+        }
+    }.writeTo("$buildDir/pom.xml")
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+dokka {
+    outputFormat = 'html'
+    outputDirectory = "$buildDir/javadoc"
+}
+
+task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
+    outputFormat = 'javadoc'
+    outputDirectory = "$buildDir/javadoc"
+}
+
+task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+    archives file: file("$buildDir/pom.xml"), name: 'pom', builtBy: createPom
 }
