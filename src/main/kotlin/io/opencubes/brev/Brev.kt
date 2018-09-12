@@ -1,11 +1,12 @@
 package io.opencubes.brev
 
+import java.util.*
 import java.util.function.*
 import java.util.function.Function
 
 
 @Suppress("UNCHECKED_CAST", "unused")
-open class Brev private constructor(val global: Boolean) : IMessageBus {
+open class Brev private constructor(val globalBus: Boolean) : IMessageBus {
   constructor() : this(false)
 
   private val listeners = mutableMapOf<Class<IEvent>, MutableSet<Entry>>()
@@ -127,19 +128,8 @@ open class Brev private constructor(val global: Boolean) : IMessageBus {
     }
   }
 
-  companion object : IMessageBus {
-
-    override fun <T : IEvent> on(event: Class<out T>, listener: (T) -> Unit) = global.on(event, listener)
-    override fun <T : IEvent> once(event: Class<out T>, listener: (T) -> Unit) = global.once(event, listener)
-    override fun <T : IEvent> many(event: Class<out T>, limit: Int, listener: (T) -> Unit) = global.many(event, limit, listener)
-    override fun <T : IEvent> off(event: Class<out T>, listener: (T) -> Unit): IMessageBus = global.off(event, listener)
-    override fun <T : IEvent> off(event: Class<out T>, stream: IEventStream<T>): IMessageBus = global.off(event, stream)
-    override fun <T : IEvent> stream(event: Class<out T>) = global.stream(event)
-    override fun <T : IEvent> emit(event: T) = global.emit(event)
-
-    private val global = Brev(true)
-
-    @JvmStatic
-    fun createBus() = Brev(false)
+  companion object : Brev(true) {
+    @JvmStatic fun createBus() = Brev(false)
+    @JvmField val global: Brev = this
   }
 }
