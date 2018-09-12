@@ -39,16 +39,18 @@ open class Brev private constructor(val global: Boolean) : IMessageBus {
   }
 
   override fun <T : IEvent> emit(event: T) {
+    val toRemove = LinkedList<Entry>()
     for (entry in ensureEventExists(event.javaClass)) {
       entry.listener(event)
       if (entry.amount == 0)
         continue
       if (entry.amount == 1) {
-        ensureEventExists(event.javaClass).remove(entry)
+        toRemove.add(entry)
         continue
       }
       entry.amount--
     }
+    ensureEventExists(event.javaClass).removeAll(toRemove)
   }
 
   override fun <T : IEvent> stream(event: Class<out T>): IEventStream<T> {
