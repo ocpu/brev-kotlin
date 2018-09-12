@@ -14,13 +14,8 @@ open class Brev private constructor(
   /**Create a new event bus. */
   constructor() : this(false)
 
-  private val listeners = mutableMapOf<Class<IEvent>, MutableSet<Entry>>()
-  private val streams = mutableMapOf<IEventStream<*>, (IEvent) -> Unit>()
-
-  private fun ensureEventExists(clazz: Class<IEvent>): MutableSet<Entry> =
-      if (clazz in listeners) listeners[clazz]!! else {
-        listeners[clazz] = mutableSetOf(); listeners[clazz]!!
-      }
+  internal val listeners = mutableMapOf<Class<IEvent>, MutableList<Entry>>()
+  internal val streams = mutableMapOf<IEventStream<*>, (IEvent) -> Unit>()
 
   override fun <T : IEvent> on(event: Class<out T>, listener: (T) -> Unit): IMessageBus =
       many(event, 0, listener)
@@ -29,13 +24,25 @@ open class Brev private constructor(
       many(event, 1, listener)
 
   override fun <T : IEvent> many(event: Class<out T>, limit: Int, listener: (T) -> Unit): IMessageBus {
-    ensureEventExists(event as Class<IEvent>).add(Entry(limit, listener as (event: IEvent) -> Unit))
+    if (limit < 0)
+      throw Exception("limit can only be a value >= 0")
+    event as Class<IEvent>
+    listener as (event: IEvent) -> Unit
+    if (event !in listeners) listeners[event] = mutableListOf(Entry(limit, listener))
+    else {
+      val entries = listeners[event]!!
+      if (entries.none { it.listener == listener })
+        entries.add(Entry(limit, listener))
+    }
     return this
   }
 
   override fun <T : IEvent> off(event: Class<out T>, listener: (T) -> Unit): IMessageBus {
-    val entry = ensureEventExists(event as Class<IEvent>).find { it.hashCode() == listener.hashCode() }
-    listeners[event]!!.remove(entry)
+    if (event as Class<IEvent> !in listeners) return this
+    val entries = listeners[event]!!
+    val e = entries.find { it.listener == listener }
+    if (e != null)
+      entries.remove(e)
     return this
   }
 
@@ -45,9 +52,17 @@ open class Brev private constructor(
   }
 
   override fun <T : IEvent> emit(event: T) {
+    val c = event.javaClass as Class<IEvent>
+    if (c !in listeners) return
+
     val toRemove = LinkedList<Entry>()
-    for (entry in ensureEventExists(event.javaClass)) {
-      entry.listener(event)
+    for (entry in listeners[c]!!) {
+      try {
+        entry.listener(event)
+      } catch (_: ClassCastException) {
+        // Respect mock functions
+        (entry.listener as (Array<Any>) -> Unit)(arrayOf(event))
+      }
       if (entry.amount == 0)
         continue
       if (entry.amount == 1) {
@@ -56,7 +71,7 @@ open class Brev private constructor(
       }
       entry.amount--
     }
-    ensureEventExists(event.javaClass).removeAll(toRemove)
+    listeners[c]!!.removeAll(toRemove)
   }
 
   override fun <T : IEvent> stream(event: Class<out T>): IEventStream<T> {
@@ -67,8 +82,7 @@ open class Brev private constructor(
     return stream
   }
 
-  private class Entry(var amount: Int, val listener: (event: IEvent) -> Unit) {
-    override fun hashCode() = listener.hashCode()
+  internal class Entry(var amount: Int, val listener: (event: IEvent) -> Unit) {
     override fun equals(other: Any?): Boolean {
       if (this === other) return true
       if (javaClass != other?.javaClass) return false
