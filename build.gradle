@@ -3,7 +3,7 @@ plugins {
     id 'org.jetbrains.dokka' version '0.9.16'
     id 'com.jfrog.bintray' version '1.8.0'
     id 'maven'
-//    id 'signing'
+    id 'signing'
 }
 
 group = 'io.opencubes'
@@ -103,4 +103,9 @@ artifacts {
     archives sourcesJar
     archives javadocJar
     archives file: file("$buildDir/pom.xml"), name: 'pom', builtBy: createPom
+}
+
+signing {
+    useGpgCmd()
+    sign configurations.archives
 }
