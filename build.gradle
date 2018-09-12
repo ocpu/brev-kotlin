@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'io.opencubes'
-version = '1.0.0'
+version = '1.1.0'
 
 allprojects {
     repositories {
@@ -17,15 +17,15 @@ allprojects {
     apply plugin: 'kotlin'
 
     dependencies {
-        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.40"
+        compile 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.40'
     }
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = '1.8'
 }
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = '1.8'
 }
 
 bintray {
@@ -33,10 +33,10 @@ bintray {
     key = bintrayKey
     configurations = ['archives']
     pkg {
-        repo = "maven"
+        repo = 'maven'
         name = project.name
         websiteUrl = 'https://github.com/ocpu/brev-kotlin'
-        vcsUrl = "https://github.com/ocpu/brev-kotlin.git"
+        vcsUrl = 'https://github.com/ocpu/brev-kotlin.git'
         licenses = ['MIT']
 //        publish = true
         version {
@@ -49,7 +49,7 @@ bintray {
 task createPom << {
     pom {
         project {
-            packaging "jar"
+            packaging 'jar'
             groupId project.group
             artifactId archivesBaseName
             version project.version
@@ -65,14 +65,14 @@ task createPom << {
             }
             developers {
                 developer {
-                    id "ocpu"
-                    name "Martin Hövre"
-                    email "martin.hovre@opencubes.io"
+                    id 'ocpu'
+                    name 'Martin Hövre'
+                    email 'martin.hovre@opencubes.io'
                 }
             }
             scm {
-                connection "https://github.com/ocpu/brev-kotlin.git"
-                developerConnection "https://github.com/ocpu/brev-kotlin.git"
+                connection 'https://github.com/ocpu/brev-kotlin.git'
+                developerConnection 'https://github.com/ocpu/brev-kotlin.git'
                 url 'https://github.com/ocpu/brev-kotlin'
             }
         }
