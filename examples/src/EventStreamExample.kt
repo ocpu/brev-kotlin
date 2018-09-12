@@ -1,10 +1,9 @@
-import io.opencubes.brev.Brev
-import io.opencubes.brev.IEvent
+import io.opencubes.brev.*
 
 object EventStreamExample {
   @JvmStatic
   fun main(args: Array<String>) {
-    Brev.stream(MyEvent::class.java)
+    Brev.stream<MyEvent>()
         .map { it.value.toUpperCase() }
         .forEach {
           println("Greetings $it!")
