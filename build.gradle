@@ -47,37 +47,39 @@ bintray {
     }
 }
 
-task createPom << {
-    pom {
-        project {
-            packaging 'jar'
-            groupId project.group
-            artifactId archivesBaseName
-            version project.version
-            name project.name
-            description 'A basic event system'
-            url 'https://github.com/ocpu/brev-kotlin'
-            inceptionYear '2017'
-            licenses {
-                license {
-                    name 'MIT'
-                    distribution 'repo'
-                }
-            }
-            developers {
-                developer {
-                    id 'ocpu'
-                    name 'Martin Hövre'
-                    email 'martin.hovre@opencubes.io'
-                }
-            }
-            scm {
-                connection 'https://github.com/ocpu/brev-kotlin.git'
-                developerConnection 'https://github.com/ocpu/brev-kotlin.git'
+task createPom {
+    doLast {
+        pom {
+            project {
+                packaging 'jar'
+                groupId project.group
+                artifactId archivesBaseName
+                version project.version
+                name project.name
+                description 'A basic event system'
                 url 'https://github.com/ocpu/brev-kotlin'
+                inceptionYear '2017'
+                licenses {
+                    license {
+                        name 'MIT'
+                        distribution 'repo'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'ocpu'
+                        name 'Martin Hövre'
+                        email 'martin.hovre@opencubes.io'
+                    }
+                }
+                scm {
+                    connection 'https://github.com/ocpu/brev-kotlin.git'
+                    developerConnection 'https://github.com/ocpu/brev-kotlin.git'
+                    url 'https://github.com/ocpu/brev-kotlin'
+                }
             }
-        }
-    }.writeTo("$buildDir/pom.xml")
+        }.writeTo("$buildDir/pom.xml")
+    }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
