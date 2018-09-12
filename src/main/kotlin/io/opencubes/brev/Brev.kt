@@ -5,8 +5,13 @@ import java.util.function.*
 import java.util.function.Function
 
 
+/**A simple implementation of [IMessageBus] and as a whole a event bus implementation. */
 @Suppress("UNCHECKED_CAST", "unused")
-open class Brev private constructor(val globalBus: Boolean) : IMessageBus {
+open class Brev private constructor(
+    /**A boolean to see if the bus is the global one. */
+    val globalBus: Boolean
+) : IMessageBus {
+  /**Create a new event bus. */
   constructor() : this(false)
 
   private val listeners = mutableMapOf<Class<IEvent>, MutableSet<Entry>>()
@@ -76,6 +81,7 @@ open class Brev private constructor(val globalBus: Boolean) : IMessageBus {
     }
   }
 
+  /**A simple implementation of [IEventStream]. */
   class EventStream<T> : IEventStream<T> {
 
     private var func: ((T) -> Unit)? = null
@@ -123,13 +129,17 @@ open class Brev private constructor(val globalBus: Boolean) : IMessageBus {
       return stream
     }
 
+    /**Starts executing the stream. */
     operator fun invoke(value: T) {
       func?.invoke(value)
     }
   }
 
+  /**The global bus. */
   companion object : Brev(true) {
+    /**Creates a new event bus. */
     @JvmStatic fun createBus() = Brev(false)
+    /**The global bus in a property. */
     @JvmField val global: Brev = this
   }
 }
