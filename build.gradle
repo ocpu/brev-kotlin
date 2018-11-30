@@ -89,8 +89,8 @@ signing {
 }
 
 bintray {
-    user = bintrayUser
-    key = bintrayKey
+    user = hasProperty('bintrayUser') ? bintrayUser : ""
+    key = hasProperty('bintrayKey') ? bintrayKey : ""
     publications = ['mavenKotlin']
     pkg {
         repo = 'maven'
@@ -106,7 +106,7 @@ bintray {
             vcsTag = project.version
             gpg {
                 sign = true
-                passphrase = property("signing.password")
+                passphrase = hasProperty("signPassword") ? signPassword : ""
             }
         }
     }
