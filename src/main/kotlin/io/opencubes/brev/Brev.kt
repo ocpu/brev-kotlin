@@ -63,13 +63,13 @@ open class Brev private constructor(
         // Respect mock functions
         (entry.listener as (Array<Any>) -> Unit)(arrayOf(event))
       }
-      if (entry.amount == 0)
+      if (entry.left == 0)
         continue
-      if (entry.amount == 1) {
+      if (entry.left == 1) {
         toRemove.add(entry)
         continue
       }
-      entry.amount--
+      entry.left--
     }
     listeners[c]!!.removeAll(toRemove)
   }
@@ -82,7 +82,7 @@ open class Brev private constructor(
     return stream
   }
 
-  internal class Entry(var amount: Int, val listener: (event: IEvent) -> Unit) {
+  internal class Entry(var left: Int, val listener: (event: IEvent) -> Unit) {
     override fun equals(other: Any?): Boolean {
       if (this === other) return true
       if (javaClass != other?.javaClass) return false
@@ -95,7 +95,7 @@ open class Brev private constructor(
     }
 
     override fun hashCode(): Int {
-      var result = amount
+      var result = left
       result = 31 * result + listener.hashCode()
       return result
     }
