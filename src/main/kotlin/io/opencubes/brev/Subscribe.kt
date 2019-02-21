@@ -1,7 +1,7 @@
 package io.opencubes.brev
 
 /**
- * @param value The amount of times the method can the executed
+ * @param limit The amount of times the method can the executed
  */
 @Target(AnnotationTarget.FUNCTION)
-annotation class Subscribe(val value: Int = 0)
+annotation class Subscribe(val limit: Int = 0)

@@ -9,7 +9,7 @@ object SubscribeExample {
         .forEach { method ->
           subscriptionBus.many(
               method.parameterTypes[0] as Class<IEvent>, // event
-              method.getAnnotation(Subscribe::class.java).value // limit (0 = never remove)
+              method.getAnnotation(Subscribe::class.java).limit // limit (0 = never remove)
           ) { event -> method.invoke(SubscribeExample, event) } // listener
         }
     Brev.emit(MyEvent("World"))
