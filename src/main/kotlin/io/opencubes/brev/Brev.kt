@@ -6,24 +6,24 @@ import java.util.function.Function
 
 
 /**A simple implementation of [IMessageBus] and as a whole a event bus implementation. */
-@Suppress("UNCHECKED_CAST", "unused")
+@Suppress("UNCHECKED_CAST")
 open class Brev private constructor(
     /**A boolean to see if the bus is the global one. */
     val globalBus: Boolean
-) : IMessageBus {
+) : IMessageBus<IEvent> {
   /**Create a new event bus. */
   constructor() : this(false)
 
   internal val listeners = mutableMapOf<Class<IEvent>, MutableList<Entry>>()
   internal val streams = mutableMapOf<IEventStream<*>, (IEvent) -> Unit>()
 
-  override fun <T : IEvent> on(event: Class<out T>, listener: (T) -> Unit): IMessageBus =
+  override fun <T : IEvent> on(event: Class<out T>, listener: (T) -> Unit): IMessageBus<IEvent> =
       many(event, 0, listener)
 
-  override fun <T : IEvent> once(event: Class<out T>, listener: (T) -> Unit): IMessageBus =
+  override fun <T : IEvent> once(event: Class<out T>, listener: (T) -> Unit): IMessageBus<IEvent> =
       many(event, 1, listener)
 
-  override fun <T : IEvent> many(event: Class<out T>, limit: Int, listener: (T) -> Unit): IMessageBus {
+  override fun <T : IEvent> many(event: Class<out T>, limit: Int, listener: (T) -> Unit): IMessageBus<IEvent> {
     if (limit < 0)
       throw Exception("limit can only be a value >= 0")
     event as Class<IEvent>
@@ -37,7 +37,7 @@ open class Brev private constructor(
     return this
   }
 
-  override fun <T : IEvent> off(event: Class<out T>, listener: (T) -> Unit): IMessageBus {
+  override fun <T : IEvent> off(event: Class<out T>, listener: (T) -> Unit): IMessageBus<IEvent> {
     if (event as Class<IEvent> !in listeners) return this
     val entries = listeners[event]!!
     val e = entries.find { it.listener == listener }
@@ -46,7 +46,7 @@ open class Brev private constructor(
     return this
   }
 
-  override fun <T : IEvent> off(event: Class<out T>, stream: IEventStream<T>): IMessageBus {
+  override fun <T : IEvent> off(event: Class<out T>, stream: IEventStream<T>): IMessageBus<IEvent> {
     val listener = if (streams.contains(stream)) streams[stream] else null
     return if (listener == null) this else off(event, listener)
   }
