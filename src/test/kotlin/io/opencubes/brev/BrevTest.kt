@@ -2,7 +2,7 @@ package io.opencubes.brev
 
 import org.junit.jupiter.api.*
 
-@Suppress("USELESS_CAST")
+@Suppress("MemberVisibilityCanBePrivate")
 internal class BrevTest {
 
   lateinit var bus: Brev
@@ -158,6 +158,13 @@ internal class BrevTest {
     assertThrows<Exception> {
       bus.many(MyEvent::class.java, -1, mock1fn)
     }
+  }
+
+  @Test
+  fun `global or local event bus`() {
+    assert(Brev.globalBus) { "The supposed global bus is not?" }
+    assert(Brev.global.globalBus) { "The supposed global bus is not?" }
+    assert(!bus.globalBus) { "The local bus is global?" }
   }
 
   class Mock {
