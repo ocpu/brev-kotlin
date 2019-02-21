@@ -57,12 +57,7 @@ open class Brev private constructor(
 
     val toRemove = LinkedList<Entry>()
     for (entry in listeners[c]!!) {
-      try {
-        entry.listener(event)
-      } catch (_: ClassCastException) {
-        // Respect mock functions
-        (entry.listener as (Array<Any>) -> Unit)(arrayOf(event))
-      }
+      entry.listener(event)
       if (entry.left == 0)
         continue
       if (entry.left == 1) {

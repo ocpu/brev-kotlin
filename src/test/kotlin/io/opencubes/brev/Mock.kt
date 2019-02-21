@@ -1,19 +1,13 @@
 package io.opencubes.brev
 
 class Mock {
-  private val _calls = mutableListOf<Array<out Any>>()
-  var returns: Any = Unit
+  val calls = mutableListOf<Array<out Any>>()
 
-  val calls: List<Array<out Any>> get() = _calls
-
-  operator fun invoke(vararg args: Any): Any {
-    _calls += args
-    return returns
+  fun memorize(vararg args: Any) {
+    calls.add(args)
   }
 
   fun clear() {
-    _calls.clear()
+    calls.clear()
   }
-
-  inline fun <reified T: Any> fn(): T = this::invoke as T
 }

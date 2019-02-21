@@ -16,8 +16,8 @@ internal class BrevTest {
     mock2.clear()
   }
 
-  val mock1fn = mock1.fn<(MyEvent) -> Unit>()
-  val mock2fn = mock2.fn<(MyEvent) -> Unit>()
+  fun mock1fn(event: IEvent) = mock1.memorize(event)
+  fun mock2fn(event: IEvent) = mock2.memorize(event)
   val event = MyEvent::class.java as Class<out IEvent>
   val e = MyEvent("value")
 
@@ -25,7 +25,7 @@ internal class BrevTest {
   fun `registers a function`() {
     assert(bus.listeners.isEmpty()) { "Listeners has a initial entries" }
     assert(bus.streams.isEmpty()) { "Streams has a initial entries" }
-    bus.on(MyEvent::class.java, mock1fn)
+    bus.on(MyEvent::class.java, ::mock1fn)
     assert(bus.listeners.size == 1) {
       if (bus.listeners.size > 1) "More than one event was added"
       else "Nothing happened"
@@ -41,7 +41,7 @@ internal class BrevTest {
   @Test
   fun `unregisters a function`() {
     `registers a function`()
-    bus.off(MyEvent::class.java, mock1fn)
+    bus.off(MyEvent::class.java, ::mock1fn)
     assert(bus.listeners[event]!!.isEmpty()) { "Failed to unregister function" }
     assert(bus.streams.isEmpty()) { "Something was added to streams when it shouldn't" }
   }
@@ -49,7 +49,7 @@ internal class BrevTest {
   @Test
   fun `unable to register same function`() {
     `registers a function`()
-    bus.on(MyEvent::class.java, mock1fn)
+    bus.on(MyEvent::class.java, ::mock1fn)
     assert(bus.listeners[event]!!.size == 1) {
       if (bus.listeners[event]!!.size > 1) "The listener was added twice"
       else "Something removed the listener"
@@ -60,7 +60,7 @@ internal class BrevTest {
   @Test
   fun `removes nothing if the function is not registered`() {
     `registers a function`()
-    bus.off(MyEvent::class.java, mock2fn)
+    bus.off(MyEvent::class.java, ::mock2fn)
     assert(bus.listeners.size == 1) {
       if (bus.listeners.size > 1) "One more event was added"
       else "mock 1 was removed"
@@ -77,14 +77,14 @@ internal class BrevTest {
   fun `removes nothing if the event is not registered`() {
     assert(bus.listeners.isEmpty()) { "Listeners has a initial entries" }
     assert(bus.streams.isEmpty()) { "Streams has a initial entries" }
-    bus.off(MyEvent::class.java, mock1fn)
+    bus.off(MyEvent::class.java, ::mock1fn)
     assert(bus.listeners.isEmpty()) { "Something was added to listeners when it shouldn't" }
     assert(bus.streams.isEmpty()) { "Something was added to streams when it shouldn't" }
   }
 
   @Test
   fun `triggers listener`() {
-    bus.on(MyEvent::class.java, mock1fn)
+    bus.on(MyEvent::class.java, ::mock1fn)
     bus.emit(e)
     assert(mock1.calls.size == 1) { "mock 1 was not called" }
     assert(mock1.calls[0][0] as MyEvent == e) { "mock 1 called but not with the event" }
@@ -99,7 +99,7 @@ internal class BrevTest {
   fun `once registers a function`() {
     assert(bus.listeners.isEmpty()) { "Listeners has a initial entries" }
     assert(bus.streams.isEmpty()) { "Streams has a initial entries" }
-    bus.once(MyEvent::class.java, mock1fn)
+    bus.once(MyEvent::class.java, ::mock1fn)
     assert(bus.listeners.size == 1) {
       if (bus.listeners.size > 1) "More than one event was added"
       else "Nothing happened"
@@ -114,7 +114,7 @@ internal class BrevTest {
 
   @Test
   fun `once executes with function registered`() {
-    bus.once(MyEvent::class.java, mock1fn)
+    bus.once(MyEvent::class.java, ::mock1fn)
     bus.emit(e)
     assert(mock1.calls.size == 1) { "mock 1 was not called" }
     assert(mock1.calls[0][0] as MyEvent == e) { "mock 1 called but not with the event" }
@@ -126,7 +126,7 @@ internal class BrevTest {
   fun `many registers a function`() {
     assert(bus.listeners.isEmpty()) { "Listeners has a initial entries" }
     assert(bus.streams.isEmpty()) { "Streams has a initial entries" }
-    bus.many(MyEvent::class.java, 0, mock1fn)
+    bus.many(MyEvent::class.java, 0, ::mock1fn)
     assert(bus.listeners.size == 1) {
       if (bus.listeners.size > 1) "More than one event was added"
       else "Nothing happened"
@@ -141,7 +141,7 @@ internal class BrevTest {
 
   @Test
   fun `many executes with function registered`() {
-    bus.many(MyEvent::class.java, 3, mock1fn)
+    bus.many(MyEvent::class.java, 3, ::mock1fn)
     bus.emit(e)
     bus.emit(e)
     bus.emit(e)
@@ -156,7 +156,7 @@ internal class BrevTest {
   @Test
   fun `many only takes signed values`() {
     assertThrows<Exception> {
-      bus.many(MyEvent::class.java, -1, mock1fn)
+      bus.many(MyEvent::class.java, -1, ::mock1fn)
     }
   }
 
