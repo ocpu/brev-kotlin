@@ -2,7 +2,7 @@ package io.opencubes.brev
 
 class Mock {
   private val _calls = mutableListOf<Array<out Any>>()
-  private var returns: Any = Unit
+  var returns: Any = Unit
 
   val calls: List<Array<out Any>> get() = _calls
 
