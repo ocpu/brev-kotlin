@@ -93,6 +93,12 @@ open class Brev private constructor(
 
       return true
     }
+
+    override fun hashCode(): Int {
+      var result = amount
+      result = 31 * result + listener.hashCode()
+      return result
+    }
   }
 
   /**A simple implementation of [IEventStream]. */
